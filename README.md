@@ -1,70 +1,62 @@
-# Getting Started with Create React App
+# importing a function when required
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+to import sum2Nums function only when the btn is clicked
 
-## Available Scripts
+import ('filepath').then(module => {
+//perform action here
+})
 
-In the project directory, you can run:
+'../utils' is the file which contains function sum2Nums.
 
-### `npm start`
+```
+function handleClick() {
+    import('../utils').then((module) => {
+      let res = module.sum2Nums(ip1.current.value, ip2.current.value);
+      setResult(res);
+    });
+  }
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+<button onClick={handleClick}>Click to add</button>
+```
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+# to lazy load component when required
 
-### `npm test`
+```
+// for default export
+const Home = lazy(() => import('./components/Home'));
+const Store = lazy(() => import('./components/Store'));
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+// for named export
+const About = lazy(() =>
+  import('./components/About').then((module) => {
+    return { default: module.About };
+  })
+);
 
-### `npm run build`
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+//use normally
+<Route path="/" element={<NavWrapper />}>
+    <Route path="store" element={<Store />} />
+    <Route path="about" element={<About />} />
+    <Route path="home" element={<Home />} />
+</Route>
+```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+Wrap the lazy loaded component with Suspense to show fallback while its bein loaded
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+```
+function NavWrapper() {
+  return (
+    <>
+      <nav style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+        <Link to={'/home'}>Home</Link>
+        <Link to={'/store'}>Store</Link>
+        <Link to={'/about'}>About</Link>
+      </nav>
+      <Suspense fallback={<h1>Loading</h1>}>
+        <Outlet />
+      </Suspense>
+    </>
+  );
+}
+```

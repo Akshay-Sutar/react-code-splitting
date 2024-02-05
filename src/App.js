@@ -1,24 +1,46 @@
-import logo from './logo.svg';
+import { lazy, Suspense } from 'react';
 import './App.css';
+import { BrowserRouter, Routes, Route, Link, Outlet } from 'react-router-dom';
+
+// for default export
+const Home = lazy(() => import('./components/Home'));
+const Store = lazy(() => import('./components/Store'));
+
+// for named export
+const About = lazy(() =>
+  import('./components/About').then((module) => {
+    return { default: module.About };
+  })
+);
 
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<NavWrapper />}>
+            <Route path="store" element={<Store />} />
+            <Route path="about" element={<About />} />
+            <Route path="home" element={<Home />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
     </div>
+  );
+}
+
+function NavWrapper() {
+  return (
+    <>
+      <nav style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+        <Link to={'/home'}>Home</Link>
+        <Link to={'/store'}>Store</Link>
+        <Link to={'/about'}>About</Link>
+      </nav>
+      <Suspense fallback={<h1>Loading</h1>}>
+        <Outlet />
+      </Suspense>
+    </>
   );
 }
 
